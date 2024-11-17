@@ -19,7 +19,7 @@ type Stop struct {
 	yomi string
 }
 
-// Stop辞書
+// Stop連想配列
 // キー stop_id
 // 値 Stop
 var stopMap map[string]Stop = make(map[string]Stop)
@@ -27,10 +27,10 @@ var stopMap map[string]Stop = make(map[string]Stop)
 func main() {
 	fmt.Println("処理開始")
 
-	// inpput/StopMaster.tsvを読み込んで、stopをstopMap辞書に格納
+	// inpput/StopMaster.tsvを読み込んで、stopをstopMapに格納
 	readStopMasterTsv()
 
-	// stopMap辞書の要素をstops.txtに出力
+	// stopMap連想配列の要素をstops.txtに出力
 	writeStopsTxt()
 
 	fmt.Println("処理終了")
@@ -66,19 +66,20 @@ func readStopMasterTsv() {
 	}
 }
 
-// stops.txtを出力
+// stopMap連想配列の要素をstops.txtに出力
 func writeStopsTxt() {
 	fmt.Println("stops.txt出力")
 	file, _ := os.Create("output/stops.txt")
 	defer file.Close()
 	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
 	writer.UseCRLF = true //改行コードを\r\nにする
-	data := []string{
-		"aaa",
-		"bbb",
-		"ccc",
+	for _, stop := range stopMap {
+		data := []string{
+			stop.id,
+			stop.name,
+		}
+		writer.Write(data)
 	}
-	writer.Write(data)
 	writer.Flush()
 }
 
