@@ -29,9 +29,10 @@ func main() {
 
 	// inpput/StopMaster.tsvを読み込んで、stopをstopMapに格納
 	readStopMasterTsv()
-
 	// stopMap連想配列の要素をstops.txtに出力
 	writeStopsTxt()
+	// stopMap連想配列の要素をtranslations.txtに出力
+	writeTranslationsTxt()
 
 	fmt.Println("処理終了")
 }
@@ -70,6 +71,25 @@ func readStopMasterTsv() {
 func writeStopsTxt() {
 	fmt.Println("stops.txt出力")
 	file, _ := os.Create("output/stops.txt")
+	defer file.Close()
+	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
+	writer.UseCRLF = true //改行コードを\r\nにする
+	// stopMap連想配列の要素を取り出しながらループ
+	for _, stop := range stopMap {
+		// stopをstops.txtに出力
+		data := []string{
+			stop.id,
+			stop.name,
+		}
+		writer.Write(data)
+	}
+	writer.Flush()
+}
+
+// stopMap連想配列の要素をtranslations.txtに出力
+func writeTranslationsTxt() {
+	fmt.Println("translations.txt出力")
+	file, _ := os.Create("output/translations.txt")
 	defer file.Close()
 	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
 	writer.UseCRLF = true //改行コードを\r\nにする
