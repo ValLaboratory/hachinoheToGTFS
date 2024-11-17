@@ -74,6 +74,12 @@ func writeStopsTxt() {
 	defer file.Close()
 	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
 	writer.UseCRLF = true //改行コードを\r\nにする
+	// 見出し行を出力
+	data := []string{
+		"stop_id",
+		"stop_name",
+	}
+	writer.Write(data)
 	// stopMap連想配列の要素を取り出しながらループ
 	for _, stop := range stopMap {
 		// stopをstops.txtに出力
@@ -93,12 +99,22 @@ func writeTranslationsTxt() {
 	defer file.Close()
 	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
 	writer.UseCRLF = true //改行コードを\r\nにする
+	// 見出し行を出力
+	data := []string{
+		"table_name",
+		"field_name",
+		"language",
+		"translation",
+	}
+	writer.Write(data)
 	// stopMap連想配列の要素を取り出しながらループ
 	for _, stop := range stopMap {
 		// stopをstops.txtに出力
 		data := []string{
-			stop.id,
-			stop.name,
+			"stops",
+			"stop_name",
+			"ja-Hrkt",
+			stop.yomi,
 		}
 		writer.Write(data)
 	}
