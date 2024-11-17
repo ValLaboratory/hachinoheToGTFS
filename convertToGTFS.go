@@ -25,6 +25,19 @@ type Route struct {
 	name string
 }
 
+// ダイヤ
+type Dia struct {
+	trip_id string
+	bins    []Bin
+}
+
+// 便
+type Bin struct {
+	arrival_time   string
+	departure_time string
+	stop_id        string
+}
+
 // Stop連想配列
 // キー stop_id
 // 値 Stop
@@ -34,6 +47,9 @@ var stopMap map[string]Stop = make(map[string]Stop)
 // キー route_id
 // 値 Route
 var routeMap map[string]Route = make(map[string]Route)
+
+// Dia配列
+var diaList []Dia
 
 func main() {
 	fmt.Println("処理開始")
@@ -50,10 +66,13 @@ func main() {
 	// routeMap連想配列の要素をroutes.txtに出力
 	writeRoutesTxt()
 
+	// inpput/DiaMaster.tsvを読み込んで、diaをdiaListに格納
+	readDiaMasterTsv()
+
 	fmt.Println("処理終了")
 }
 
-// inpput/StopMaster.tsvを読み込んで、stopをstopMap辞書に格納
+// inpput/StopMaster.tsvを読み込んで、stopをstopMap連想配列に格納
 func readStopMasterTsv() {
 	fmt.Println("StopMaster.tsv読み込み")
 	var file string = "input/StopMaster.tsv"
@@ -83,7 +102,7 @@ func readStopMasterTsv() {
 	}
 }
 
-// inpput/RouteMaster.tsvを読み込んで、routeをrouteMap辞書に格納
+// inpput/RouteMaster.tsvを読み込んで、routeをrouteMap連想配列に格納
 func readRouteMasterTsv() {
 	fmt.Println("RouteMaster.tsv読み込み")
 	var file string = "input/RouteMaster.tsv"
@@ -109,6 +128,35 @@ func readRouteMasterTsv() {
 		route.id = elements[1]
 		route.name = elements[5]
 		routeMap[route.id] = route
+	}
+}
+
+// inpput/DiaMaster.tsvを読み込んで、diaをdiaListに格納
+func readDiaMasterTsv() {
+	fmt.Println("DiaMaster.tsv読み込み")
+	var file string = "input/DiaMaster.tsv"
+	if _, err := os.Stat(file); err != nil {
+		fmt.Println("ファイルは存在しません！" + file)
+		os.Exit(1)
+	}
+	data, _ := os.Open(file)
+	defer data.Close()
+
+	var line string
+
+	scanner := bufio.NewScanner(data)
+	// 1行ずつ読み込み
+	for scanner.Scan() {
+		// 1行読み込み
+		line = sjis_to_utf8(scanner.Text())
+		// 1行をタブで分割
+		elements := strings.Split(line, "\t")
+		// stop構造体を作成
+		var dia Dia = Dia{}
+		// dia構造体に分割された要素を格納
+		dia.trip_id = elements[1]
+		// dia配列にdiaを追加
+		diaList = append(diaList, dia)
 	}
 }
 
