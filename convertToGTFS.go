@@ -20,6 +20,12 @@ type Stop struct {
 	yomi string
 }
 
+// ポール
+type Pole struct {
+	id      string
+	stop_id string
+}
+
 // 系統
 type Route struct {
 	id   string
@@ -46,6 +52,9 @@ type StopTime struct {
 // 値 Stop
 var stopMap map[string]Stop = make(map[string]Stop)
 
+// Pole配列
+var poleList []Pole
+
 // Route連想配列
 // キー route_id
 // 値 Route
@@ -59,7 +68,9 @@ func main() {
 
 	// inpput/StopMaster.tsvを読み込んで、stopをstopMapに格納
 	readStopMasterTsv()
-	// stopMap連想配列の要素をstops.txtに出力
+	// inpput/StopPoleMaster.tsvを読み込んで、poleをpole配列に格納
+	readStopPoleMasterTsv()
+	// pole配列の要素をstops.txtに出力
 	writeStopsTxt()
 	// stopMap連想配列の要素をtranslations.txtに出力
 	writeTranslationsTxt()
@@ -108,6 +119,35 @@ func readStopMasterTsv() {
 		stop.name = elements[2]
 		stop.yomi = elements[3]
 		stopMap[stop.id] = stop
+	}
+}
+
+// inpput/StopPoleMaster.tsvを読み込んで、poleをpole配列に格納
+func readStopPoleMasterTsv() {
+	fmt.Println("StopPoleMaster.tsv読み込み")
+	var file string = "input/StopPoleMaster.tsv"
+	if _, err := os.Stat(file); err != nil {
+		fmt.Println("ファイルは存在しません！" + file)
+		os.Exit(1)
+	}
+	data, _ := os.Open(file)
+	defer data.Close()
+
+	var line string
+
+	scanner := bufio.NewScanner(data)
+	// 1行ずつ読み込み
+	for scanner.Scan() {
+		// 1行読み込み
+		line = sjis_to_utf8(scanner.Text())
+		// 1行をタブで分割
+		elements := strings.Split(line, "\t")
+		// pole構造体を作成
+		var pole Pole = Pole{}
+		// stop構造体に分割された要素を格納
+		pole.id = elements[1]
+		pole.stop_id = elements[2]
+		poleList = append(poleList, pole)
 	}
 }
 
@@ -214,13 +254,17 @@ func writeStopsTxt() {
 	}
 	writer.Write(data)
 	// stopMap連想配列の要素を取り出しながらループ
-	for _, stop := range stopMap {
-		// stopをstops.txtに出力
-		data := []string{
-			stop.id,
-			stop.name,
+	for _, pole := range poleList {
+
+		if stop, ok := stopMap[pole.stop_id]; ok {
+			// stopをstops.txtに出力
+			data := []string{
+				pole.id,
+				stop.name,
+			}
+			writer.Write(data)
 		}
-		writer.Write(data)
+
 	}
 	writer.Flush()
 }
