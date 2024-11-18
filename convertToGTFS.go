@@ -25,17 +25,19 @@ type Route struct {
 	name string
 }
 
-// ダイヤ
-type Dia struct {
-	trip_id string
-	bins    []Bin
+// 便
+type Trip struct {
+	id        string
+	route_id  string
+	yobi      string
+	stopTimes []StopTime
 }
 
-// 便
-type Bin struct {
+// バス停と着発時刻
+type StopTime struct {
+	stop_id        string
 	arrival_time   string
 	departure_time string
-	stop_id        string
 }
 
 // Stop連想配列
@@ -48,8 +50,8 @@ var stopMap map[string]Stop = make(map[string]Stop)
 // 値 Route
 var routeMap map[string]Route = make(map[string]Route)
 
-// Dia配列
-var diaList []Dia
+// Trip配列
+var tripList []Trip
 
 func main() {
 	fmt.Println("処理開始")
@@ -66,8 +68,10 @@ func main() {
 	// routeMap連想配列の要素をroutes.txtに出力
 	writeRoutesTxt()
 
-	// inpput/DiaMaster.tsvを読み込んで、diaをdiaListに格納
+	// inpput/DiaMaster.tsvを読み込んで、tripListに格納
 	readDiaMasterTsv()
+	// tripListの要素をstop_times.txtに出力
+	writeStopTimesTxt()
 
 	fmt.Println("処理終了")
 }
@@ -131,7 +135,7 @@ func readRouteMasterTsv() {
 	}
 }
 
-// inpput/DiaMaster.tsvを読み込んで、diaをdiaListに格納
+// inpput/DiaMaster.tsvを読み込んで、tripListに格納
 func readDiaMasterTsv() {
 	fmt.Println("DiaMaster.tsv読み込み")
 	var file string = "input/DiaMaster.tsv"
@@ -152,11 +156,31 @@ func readDiaMasterTsv() {
 		// 1行をタブで分割
 		elements := strings.Split(line, "\t")
 		// stop構造体を作成
-		var dia Dia = Dia{}
+		var trip Trip = Trip{}
 		// dia構造体に分割された要素を格納
-		dia.trip_id = elements[1]
+		trip.yobi = elements[1]
+		trip.route_id = elements[4]
 		// dia配列にdiaを追加
-		diaList = append(diaList, dia)
+		tripList = append(tripList, trip)
+
+		// 5列目 stop_id 6列名 着時刻 7列名 発時刻 を stopTimeに格納
+		// 8列名以降はその繰り返し
+		// 5列名以降の繰り返しの数を計算
+		var elementSize int = len(elements)
+		var blockCnt int = (len(elements) - 4) / 3
+
+		for i := 0; i < blockCnt; i++ {
+			var stopTime StopTime
+			stopTime.stop_id = elements[5+i*3]
+			if 6+i*3 < elementSize {
+				stopTime.arrival_time = elements[6+i*3]
+			}
+			if 7+i*3 < elementSize {
+				stopTime.departure_time = elements[7+i*3]
+			}
+			trip.stopTimes = append(trip.stopTimes, stopTime)
+		}
+
 	}
 }
 
@@ -233,6 +257,31 @@ func writeRoutesTxt() {
 		data := []string{
 			route.id,
 			route.name,
+		}
+		writer.Write(data)
+	}
+	writer.Flush()
+}
+
+// tripListの要素をstop_times.txtに出力
+func writeStopTimesTxt() {
+	fmt.Println("stop_times.txt出力")
+	file, _ := os.Create("output/stop_times.txt")
+	defer file.Close()
+	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
+	writer.UseCRLF = true //改行コードを\r\nにする
+	// 見出し行を出力
+	data := []string{
+		"trip_id",
+		"stop_id",
+	}
+	writer.Write(data)
+	// tripListの要素を取り出しながらループ
+	for _, trip := range tripList {
+		// routeをsroutes.txtに出力
+		data := []string{
+			trip.id,
+			trip.yobi,
 		}
 		writer.Write(data)
 	}
