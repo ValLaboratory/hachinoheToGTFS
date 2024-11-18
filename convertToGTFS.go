@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 
 	"golang.org/x/text/encoding/japanese"
@@ -158,29 +159,36 @@ func readDiaMasterTsv() {
 		// stop構造体を作成
 		var trip Trip = Trip{}
 		// dia構造体に分割された要素を格納
-		trip.yobi = elements[1]
+		var yobi string = elements[1]
+		if yobi == "1" {
+			trip.yobi = "平"
+		} else if yobi == "2" {
+			trip.yobi = "日"
+		} else if yobi == "4" {
+			trip.yobi = "土"
+		}
 		trip.route_id = elements[4]
-		// dia配列にdiaを追加
-		tripList = append(tripList, trip)
 
-		// 5列目 stop_id 6列名 着時刻 7列名 発時刻 を stopTimeに格納
-		// 8列名以降はその繰り返し
+		// 5列目 stop_id 6列名 着時刻 7列名 発時刻 を stopTimeに格納  8列名 9列目は捨てる
+		// 10列名以降はその繰り返し
 		// 5列名以降の繰り返しの数を計算
 		var elementSize int = len(elements)
-		var blockCnt int = (len(elements) - 4) / 3
+		var blockCnt int = (len(elements) - 4) / 5
 
 		for i := 0; i < blockCnt; i++ {
 			var stopTime StopTime
-			stopTime.stop_id = elements[5+i*3]
+			stopTime.stop_id = elements[5+i*5]
 			if 6+i*3 < elementSize {
-				stopTime.arrival_time = elements[6+i*3]
+				stopTime.arrival_time = elements[6+i*5]
 			}
 			if 7+i*3 < elementSize {
-				stopTime.departure_time = elements[7+i*3]
+				stopTime.departure_time = elements[7+i*5]
 			}
 			trip.stopTimes = append(trip.stopTimes, stopTime)
 		}
 
+		// dia配列にdiaを追加
+		tripList = append(tripList, trip)
 	}
 }
 
@@ -273,17 +281,27 @@ func writeStopTimesTxt() {
 	// 見出し行を出力
 	data := []string{
 		"trip_id",
+		"arrival_time",
+		"departure_time",
 		"stop_id",
+		"stop_sequence",
 	}
 	writer.Write(data)
 	// tripListの要素を取り出しながらループ
 	for _, trip := range tripList {
 		// routeをsroutes.txtに出力
-		data := []string{
-			trip.id,
-			trip.yobi,
+		var sequence int = 1
+		for _, stopTime := range trip.stopTimes {
+			data := []string{
+				trip.id,
+				stopTime.arrival_time,
+				stopTime.departure_time,
+				stopTime.stop_id,
+				strconv.Itoa(sequence),
+			}
+			writer.Write(data)
+			sequence++
 		}
-		writer.Write(data)
 	}
 	writer.Flush()
 }
