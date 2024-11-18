@@ -179,10 +179,10 @@ func readDiaMasterTsv() {
 			var stopTime StopTime
 			stopTime.stop_id = elements[5+i*5]
 			if 6+i*3 < elementSize {
-				stopTime.arrival_time = elements[6+i*5]
+				stopTime.arrival_time = toTime(elements[6+i*5])
 			}
 			if 7+i*3 < elementSize {
-				stopTime.departure_time = elements[7+i*5]
+				stopTime.departure_time = toTime(elements[7+i*5])
 			}
 			trip.stopTimes = append(trip.stopTimes, stopTime)
 		}
@@ -304,6 +304,20 @@ func writeStopTimesTxt() {
 		}
 	}
 	writer.Flush()
+}
+
+// 時刻文字列を返す
+// 610→6:10
+// 1725→17:25
+func toTime(str string) string {
+	var len int = len(str)
+	var time string
+	if len == 3 {
+		time = str[0:1] + ":" + str[1:]
+	} else if len == 4 {
+		time = str[0:2] + ":" + str[1:]
+	}
+	return time
 }
 
 // SJISをUTF8に変換
