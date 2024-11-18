@@ -71,6 +71,10 @@ func main() {
 
 	// inpput/DiaMaster.tsvを読み込んで、tripListに格納
 	readDiaMasterTsv()
+
+	// tripListの要素をtrips.txtに出力
+	writeTripsTxt()
+
 	// tripListの要素をstop_times.txtに出力
 	writeStopTimesTxt()
 
@@ -185,6 +189,10 @@ func readDiaMasterTsv() {
 				stopTime.departure_time = toTime(elements[7+i*5])
 			}
 			trip.stopTimes = append(trip.stopTimes, stopTime)
+
+			if i == 0 {
+				trip.id = trip.route_id + "_" + trip.yobi + "_" + stopTime.departure_time
+			}
 		}
 
 		// dia配列にdiaを追加
@@ -271,6 +279,33 @@ func writeRoutesTxt() {
 	writer.Flush()
 }
 
+// tripListの要素をtrips.txtに出力
+func writeTripsTxt() {
+	fmt.Println("trips.txt出力")
+	file, _ := os.Create("output/trips.txt")
+	defer file.Close()
+	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
+	writer.UseCRLF = true //改行コードを\r\nにする
+	// 見出し行を出力
+	data := []string{
+		"route_id",
+		"service_id",
+		"trip_id",
+	}
+	writer.Write(data)
+	// tripListの要素を取り出しながらループ
+	for _, trip := range tripList {
+		// tripをtrips.txtに出力
+		data := []string{
+			trip.route_id,
+			trip.yobi,
+			trip.id,
+		}
+		writer.Write(data)
+	}
+	writer.Flush()
+}
+
 // tripListの要素をstop_times.txtに出力
 func writeStopTimesTxt() {
 	fmt.Println("stop_times.txt出力")
@@ -289,7 +324,6 @@ func writeStopTimesTxt() {
 	writer.Write(data)
 	// tripListの要素を取り出しながらループ
 	for _, trip := range tripList {
-		// routeをsroutes.txtに出力
 		var sequence int = 1
 		for _, stopTime := range trip.stopTimes {
 			data := []string{
