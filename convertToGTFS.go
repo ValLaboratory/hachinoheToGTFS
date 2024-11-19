@@ -89,6 +89,9 @@ func main() {
 	// tripListの要素をstop_times.txtに出力
 	writeStopTimesTxt()
 
+	// calendar.txtに出力
+	writeCalendarTxt()
+
 	fmt.Println("処理終了")
 }
 
@@ -266,6 +269,31 @@ func writeStopsTxt() {
 		}
 
 	}
+	writer.Flush()
+}
+
+// calendar.txtを出力
+func writeCalendarTxt() {
+	fmt.Println("calendar.txtを出力")
+	file, _ := os.Create("output/calendar.txt")
+	defer file.Close()
+	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
+	writer.UseCRLF = true //改行コードを\r\nにする
+	// 見出し行を出力
+	data := []string{
+		"service_id",
+		"monday",
+		"tuesday",
+		"wednesday",
+		"thursday",
+		"friday",
+		"saturday",
+		"sunday",
+		"start_date",
+		"end_date",
+	}
+	writer.Write(data)
+
 	writer.Flush()
 }
 
