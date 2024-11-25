@@ -94,6 +94,9 @@ func main() {
 	// calendar.txtに出力
 	writeCalendarTxt()
 
+	// inpput/GenerationMaster.tsvを読み込んで、feed_info.txtに出力
+	readGenerationMasterTsvAndWriteFeedInfoTxt()
+
 	fmt.Println("処理終了")
 }
 
@@ -443,6 +446,46 @@ func writeStopTimesTxt() {
 			sequence++
 		}
 	}
+	writer.Flush()
+}
+
+// inpput/GenerationMaster.tsvを読み込んで、feed_info.txtに出力
+func readGenerationMasterTsvAndWriteFeedInfoTxt() {
+	fmt.Println("GenerationMaster.tsv読み込み")
+	var file string = "input/GenerationMaster.tsv"
+	if _, err := os.Stat(file); err != nil {
+		fmt.Println("ファイルは存在しません！" + file)
+		os.Exit(1)
+	}
+	data, _ := os.Open(file)
+	defer data.Close()
+
+	var line string
+
+	scanner := bufio.NewScanner(data)
+	// 1行ずつ読み込み
+	scanner.Scan()
+	// 1行読み込み
+	line = sjis_to_utf8(scanner.Text())
+	// 1行をタブで分割
+	elements := strings.Split(line, "\t")
+
+	fmt.Println("feed_info.txt出力")
+	wfile, _ := os.Create("output/feed_info.txt")
+	defer wfile.Close()
+	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(wfile, japanese.ShiftJIS.NewEncoder()))
+	writer.UseCRLF = true //改行コードを\r\nにする
+	// 見出し行を出力
+	wdata := []string{
+		"feed_start_date",
+		"feed_version",
+	}
+	writer.Write(wdata)
+	wdata = []string{
+		elements[1],
+		elements[2],
+	}
+	writer.Write(wdata)
 	writer.Flush()
 }
 
