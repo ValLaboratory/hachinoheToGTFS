@@ -24,6 +24,7 @@ type Stop struct {
 type Pole struct {
 	id      string
 	stop_id string
+	name    string
 }
 
 // 系統
@@ -150,6 +151,7 @@ func readStopPoleMasterTsv() {
 		// stop構造体に分割された要素を格納
 		pole.id = elements[1]
 		pole.stop_id = elements[2]
+		pole.name = elements[4]
 		poleList = append(poleList, pole)
 	}
 }
@@ -243,7 +245,7 @@ func readDiaMasterTsv() {
 	}
 }
 
-// stopMap連想配列の要素をstops.txtに出力
+// poleListの要素をstops.txtに出力
 func writeStopsTxt() {
 	fmt.Println("stops.txt出力")
 	file, _ := os.Create("output/stops.txt")
@@ -256,18 +258,13 @@ func writeStopsTxt() {
 		"stop_name",
 	}
 	writer.Write(data)
-	// stopMap連想配列の要素を取り出しながらループ
 	for _, pole := range poleList {
-
-		if stop, ok := stopMap[pole.stop_id]; ok {
-			// stopをstops.txtに出力
-			data := []string{
-				pole.id,
-				stop.name,
-			}
-			writer.Write(data)
+		// poleをstops.txtに出力
+		data := []string{
+			pole.id,
+			pole.name,
 		}
-
+		writer.Write(data)
 	}
 	writer.Flush()
 }
@@ -297,7 +294,7 @@ func writeCalendarTxt() {
 	writer.Flush()
 }
 
-// stopMap連想配列の要素をtranslations.txtに出力
+// poleListの要素をtranslations.txtに出力
 func writeTranslationsTxt() {
 	fmt.Println("translations.txt出力")
 	file, _ := os.Create("output/translations.txt")
@@ -312,16 +309,35 @@ func writeTranslationsTxt() {
 		"translation",
 	}
 	writer.Write(data)
+
+	var poleNameMap map[string]string = make(map[string]string)
+
 	// stopMap連想配列の要素を取り出しながらループ
-	for _, stop := range stopMap {
-		// stopをstops.txtに出力
-		data := []string{
-			"stops",
-			"stop_name",
-			"ja-Hrkt",
-			stop.yomi,
+	for _, pole := range poleList {
+
+		if _, ok := poleNameMap[pole.name]; ok {
+			continue
+		} else {
+			poleNameMap[pole.name] = pole.name
 		}
-		writer.Write(data)
+
+		if stop, ok := stopMap[pole.stop_id]; ok {
+			// stopをstops.txtに出力
+			data := []string{
+				"stops",
+				"stop_name",
+				"ja-Hrkt",
+				pole.name,
+			}
+			writer.Write(data)
+			data = []string{
+				"stops",
+				"stop_name",
+				"ja-Hrkt",
+				stop.yomi,
+			}
+			writer.Write(data)
+		}
 	}
 	writer.Flush()
 }
