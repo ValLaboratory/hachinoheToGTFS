@@ -71,10 +71,6 @@ func main() {
 	readStopMasterTsv()
 	// inpput/StopPoleMaster.tsvを読み込んで、poleをpole配列に格納
 	readStopPoleMasterTsv()
-	// pole配列の要素をstops.txtに出力
-	writeStopsTxt()
-	// stopMap連想配列の要素をtranslations.txtに出力
-	writeTranslationsTxt()
 
 	// inpput/RouteMaster.tsvを読み込んで、routeをrouteMapに格納
 	readRouteMasterTsv()
@@ -83,6 +79,11 @@ func main() {
 
 	// inpput/DiaMaster.tsvを読み込んで、tripListに格納
 	readDiaMasterTsv()
+
+	// pole配列の要素をstops.txtに出力
+	writeStopsTxt()
+	// stopMap連想配列の要素をtranslations.txtに出力
+	writeTranslationsTxt()
 
 	// tripListの要素をtrips.txtに出力
 	writeTripsTxt()
@@ -149,7 +150,7 @@ func readStopPoleMasterTsv() {
 		// pole構造体を作成
 		var pole Pole = Pole{}
 		// stop構造体に分割された要素を格納
-		pole.id = elements[1]
+		pole.id = maeZero(elements[1])
 		pole.stop_id = elements[2]
 		pole.name = elements[4]
 		poleList = append(poleList, pole)
@@ -248,6 +249,21 @@ func readDiaMasterTsv() {
 // poleListの要素をstops.txtに出力
 func writeStopsTxt() {
 	fmt.Println("stops.txt出力")
+
+	// stop_times.txtに出力する stop_id をマップに格納
+	var poleIdMap map[string]string = make(map[string]string)
+
+	// tripListの要素を取り出しながらループ
+	for _, trip := range tripList {
+		for _, stopTime := range trip.stopTimes {
+			if _, ok := poleIdMap[stopTime.stop_id]; ok {
+				continue
+			} else {
+				poleIdMap[stopTime.stop_id] = stopTime.stop_id
+			}
+		}
+	}
+
 	file, _ := os.Create("output/stops.txt")
 	defer file.Close()
 	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
@@ -260,11 +276,13 @@ func writeStopsTxt() {
 	writer.Write(data)
 	for _, pole := range poleList {
 		// poleをstops.txtに出力
-		data := []string{
-			pole.id,
-			pole.name,
+		if _, ok := poleIdMap[pole.id]; ok {
+			data := []string{
+				pole.id,
+				pole.name,
+			}
+			writer.Write(data)
 		}
-		writer.Write(data)
 	}
 	writer.Flush()
 }
@@ -440,6 +458,15 @@ func toTime(str string) string {
 		time = str[0:2] + ":" + str[1:]
 	}
 	return time
+}
+
+// 前ゼロ埋め
+func maeZero(str string) string {
+	var len = 7 - len(str)
+	for i := 0; i < len; i++ {
+		str = "0" + str
+	}
+	return str
 }
 
 // SJISをUTF8に変換
