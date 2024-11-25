@@ -209,9 +209,8 @@ func readDiaMasterTsv() {
 		line = sjis_to_utf8(scanner.Text())
 		// 1行をタブで分割
 		elements := strings.Split(line, "\t")
-		// stop構造体を作成
+		// trip構造体を作成
 		var trip Trip = Trip{}
-		// dia構造体に分割された要素を格納
 		var yobi string = elements[1]
 		if yobi == "1" {
 			trip.yobi = "平"
@@ -229,6 +228,7 @@ func readDiaMasterTsv() {
 		var blockCnt int = (len(elements) - 4) / 5
 
 		for i := 0; i < blockCnt; i++ {
+			// stopTime構造体に分割された要素を格納
 			var stopTime StopTime
 			stopTime.stop_id = elements[5+i*5]
 			if 6+i*3 < elementSize {
@@ -244,7 +244,7 @@ func readDiaMasterTsv() {
 			}
 		}
 
-		// dia配列にdiaを追加
+		// trip配列にtripを追加
 		tripList = append(tripList, trip)
 	}
 }
