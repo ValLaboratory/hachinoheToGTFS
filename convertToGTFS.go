@@ -224,11 +224,13 @@ func readDiaMasterTsv() {
 		var trip Trip = Trip{}
 		var yobi string = elements[1]
 		if yobi == "1" {
-			trip.yobi = "平"
+			trip.yobi = "1_平日"
 		} else if yobi == "2" {
-			trip.yobi = "日"
+			trip.yobi = "2_日祝"
 		} else if yobi == "4" {
-			trip.yobi = "土"
+			trip.yobi = "4_土曜"
+		} else if yobi == "3" {
+			trip.yobi = "3_特殊"
 		}
 		trip.route_id = elements[4]
 
