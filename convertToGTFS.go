@@ -296,6 +296,8 @@ func writeStopsTxt() {
 	data := []string{
 		"stop_id",
 		"stop_name",
+		"stop_lat",
+		"stop_lon",
 	}
 	writer.Write(data)
 	for _, pole := range poleList {
@@ -304,6 +306,8 @@ func writeStopsTxt() {
 			data := []string{
 				pole.id,
 				pole.name,
+				"",
+				"",
 			}
 			writer.Write(data)
 		}
