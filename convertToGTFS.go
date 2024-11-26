@@ -510,7 +510,7 @@ func writeTranslationsTxt() {
 			data := []string{
 				"stops",
 				"stop_name",
-				"ja-Hrkt",
+				"ja",
 				pole.name,
 			}
 			writer.Write(data)
