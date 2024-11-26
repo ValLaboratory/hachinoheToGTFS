@@ -490,6 +490,7 @@ func writeTranslationsTxt() {
 		"table_name",
 		"field_name",
 		"language",
+		"field_value",
 		"translation",
 	}
 	writer.Write(data)
@@ -512,12 +513,14 @@ func writeTranslationsTxt() {
 				"stop_name",
 				"ja",
 				pole.name,
+				pole.name,
 			}
 			writer.Write(data)
 			data = []string{
 				"stops",
 				"stop_name",
 				"ja-Hrkt",
+				pole.name,
 				stop.yomi,
 			}
 			writer.Write(data)
