@@ -13,6 +13,11 @@ import (
 	"golang.org/x/text/transform"
 )
 
+// 改定内容
+type Info struct {
+	version string
+}
+
 // バス停
 type Stop struct {
 	id   string
@@ -63,6 +68,9 @@ var routeMap map[string]Route = make(map[string]Route)
 // Trip配列
 var tripList []Trip
 
+// info配列
+var infoList []Info
+
 func main() {
 	fmt.Println("処理開始")
 
@@ -88,6 +96,9 @@ func main() {
 
 	// tripListの要素をstop_times.txtに出力
 	writeStopTimesTxt()
+
+	// infoListの要素をfeedinfo.txtに出力
+	writeFeedinfoTxt()
 
 	// calendar.txtに出力
 	writeCalendarTxt()
@@ -272,6 +283,66 @@ func writeStopsTxt() {
 	writer.Flush()
 }
 
+// inpput/GenerationMaster.tsvを読み込んで、infoListに格納
+func readGenerationMasterTsv() {
+	fmt.Println("GenerationMaster.tsv読み込み")
+	var file string = "input/GenerationMaster.tsv"
+	if _, err := os.Stat(file); err != nil {
+		fmt.Println("ファイルは存在しません！" + file)
+		os.Exit(1)
+	}
+	data, _ := os.Open(file)
+	defer data.Close()
+
+	var line string
+
+	scanner := bufio.NewScanner(data)
+	// 1行ずつ読み込み
+	for scanner.Scan() {
+		// 1行読み込み
+		line = sjis_to_utf8(scanner.Text())
+		// 1行をタブで分割
+		elements := strings.Split(line, "\t")
+		// stop構造体を作成
+		var trip Trip = Trip{}
+		// dia構造体に分割された要素を格納
+		var yobi string = elements[1]
+		if yobi == "1" {
+			trip.yobi = "平"
+		} else if yobi == "2" {
+			trip.yobi = "日"
+		} else if yobi == "4" {
+			trip.yobi = "土"
+		}
+		trip.route_id = elements[4]
+
+		// 5列目 stop_id 6列名 着時刻 7列名 発時刻 を stopTimeに格納  8列名 9列目は捨てる
+		// 10列名以降はその繰り返し
+		// 5列名以降の繰り返しの数を計算
+		var elementSize int = len(elements)
+		var blockCnt int = (len(elements) - 4) / 5
+
+		for i := 0; i < blockCnt; i++ {
+			var stopTime StopTime
+			stopTime.stop_id = elements[5+i*5]
+			if 6+i*3 < elementSize {
+				stopTime.arrival_time = toTime(elements[6+i*5])
+			}
+			if 7+i*3 < elementSize {
+				stopTime.departure_time = toTime(elements[7+i*5])
+			}
+			trip.stopTimes = append(trip.stopTimes, stopTime)
+
+			if i == 0 {
+				trip.id = trip.route_id + "_" + trip.yobi + "_" + stopTime.departure_time
+			}
+		}
+
+		// dia配列にdiaを追加
+		infoList = append(infoList)
+	}
+}
+
 // calendar.txtを出力
 func writeCalendarTxt() {
 	fmt.Println("calendar.txtを出力")
@@ -291,6 +362,54 @@ func writeCalendarTxt() {
 		"sunday",
 		"start_date",
 		"end_date",
+	}
+	writer.Write(data)
+
+	data = []string{
+		"1_平日",
+		"1",
+		"1",
+		"1",
+		"1",
+		"1",
+		"",
+		"",
+	}
+	writer.Write(data)
+
+	data = []string{
+		"2_日祝",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"1",
+	}
+	writer.Write(data)
+
+	data = []string{
+		"4_土曜",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"1",
+		"",
+	}
+	writer.Write(data)
+
+	data = []string{
+		"3_特殊",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
 	}
 	writer.Write(data)
 
