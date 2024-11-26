@@ -105,6 +105,9 @@ func main() {
 	// calendar.txtに出力
 	writeCalendarTxt()
 
+	// agency.txtに出力
+	writeAgencyTxt()
+
 	// inpput/GenerationMaster.tsvを読み込んで、feed_info.txtに出力
 	readGenerationMasterTsvAndWriteFeedInfoTxt()
 
@@ -438,6 +441,33 @@ func writeCalendarTxt() {
 		"",
 		"",
 		"",
+	}
+	writer.Write(data)
+
+	writer.Flush()
+}
+
+// agency.txtを出力
+func writeAgencyTxt() {
+	fmt.Println("agency.txtを出力")
+	file, _ := os.Create("output/agency.txt")
+	defer file.Close()
+	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
+	writer.UseCRLF = true //改行コードを\r\nにする
+	// 見出し行を出力
+	data := []string{
+		"agency_id",
+		"agency_name",
+		"agency_url",
+		"agency_timezone",
+	}
+	writer.Write(data)
+
+	data = []string{
+		"八戸市交通部",
+		"",
+		"",
+		"Asia/Tokyo",
 	}
 	writer.Write(data)
 
