@@ -658,16 +658,15 @@ func readGenerationMasterTsvAndWriteFeedInfoTxt() {
 // 時刻文字列を返す
 // 610→10:10
 // 301→05:01
+// hが10より小さかったら0を先頭に足す
+// mが10より小さかったら0を先頭に足す
 
 func toTime(str string) string {
 	var time int
 	time, _ = strconv.Atoi(str)
-	var h int
-	h = time / 60
-	var m int
-	m = time % 60
-	var hhmm string
-	hhmm = strconv.Itoa(h) + ":" + strconv.Itoa(m)
+	h := time / 60
+	m := time % 60
+	hhmm := strconv.Itoa(h) + ":" + strconv.Itoa(m)
 
 	return hhmm
 }
