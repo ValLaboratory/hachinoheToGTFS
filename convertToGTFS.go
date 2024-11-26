@@ -100,7 +100,7 @@ func main() {
 	writeStopTimesTxt()
 
 	// infoListの要素をfeedinfo.txtに出力
-	writeFeedinfoTxt()
+	//writeFeedinfoTxt()
 
 	// calendar.txtに出力
 	writeCalendarTxt()
