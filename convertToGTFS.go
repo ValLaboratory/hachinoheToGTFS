@@ -254,11 +254,11 @@ func readDiaMasterTsv() {
 				stopTime.departure_time = toTime(elements[7+i*5])
 			}
 			//発駅が空の時着駅時刻を埋める
-			if stopTime.arrival_time == "" {
+			if stopTime.arrival_time == "0:0" {
 				stopTime.arrival_time = stopTime.departure_time
 			}
 			//着駅が空の時発駅時刻を埋める
-			if stopTime.departure_time == "" {
+			if stopTime.departure_time == "0:0" {
 				stopTime.departure_time = stopTime.arrival_time
 			}
 			trip.stopTimes = append(trip.stopTimes, stopTime)
@@ -656,17 +656,20 @@ func readGenerationMasterTsvAndWriteFeedInfoTxt() {
 }
 
 // 時刻文字列を返す
-// 610→6:10
-// 1725→17:25
+// 610→10:10
+// 301→05:01
+
 func toTime(str string) string {
-	var len int = len(str)
-	var time string
-	if len == 3 {
-		time = str[0:1] + ":" + str[1:]
-	} else if len == 4 {
-		time = str[0:2] + ":" + str[1:]
-	}
-	return time
+	var time int
+	time, _ = strconv.Atoi(str)
+	var h int
+	h = time / 60
+	var m int
+	m = time % 60
+	var hhmm string
+	hhmm = strconv.Itoa(h) + ":" + strconv.Itoa(m)
+
+	return hhmm
 }
 
 // 前ゼロ埋め
