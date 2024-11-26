@@ -250,6 +250,14 @@ func readDiaMasterTsv() {
 			if 7+i*3 < elementSize {
 				stopTime.departure_time = toTime(elements[7+i*5])
 			}
+			//発駅が空の時着駅時刻を埋める
+			if stopTime.arrival_time == "" {
+				stopTime.arrival_time = stopTime.departure_time
+			}
+			//着駅が空の時発駅時刻を埋める
+			if stopTime.departure_time == "" {
+				stopTime.departure_time = stopTime.arrival_time
+			}
 			trip.stopTimes = append(trip.stopTimes, stopTime)
 
 			if i == 0 {
