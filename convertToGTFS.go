@@ -254,11 +254,11 @@ func readDiaMasterTsv() {
 				stopTime.departure_time = toTime(elements[7+i*5])
 			}
 			//発駅が空の時着駅時刻を埋める
-			if stopTime.arrival_time == "0:0" {
+			if stopTime.arrival_time == "00:00" {
 				stopTime.arrival_time = stopTime.departure_time
 			}
 			//着駅が空の時発駅時刻を埋める
-			if stopTime.departure_time == "0:0" {
+			if stopTime.departure_time == "00:00" {
 				stopTime.departure_time = stopTime.arrival_time
 			}
 			trip.stopTimes = append(trip.stopTimes, stopTime)
@@ -475,7 +475,7 @@ func writeAgencyTxt() {
 
 	data = []string{
 		"八戸市交通部",
-		"",
+		"八戸市交通部",
 		"",
 		"Asia/Tokyo",
 	}
