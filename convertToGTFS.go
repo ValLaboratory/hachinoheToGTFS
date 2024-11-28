@@ -409,6 +409,8 @@ func writeCalendarTxt() {
 		"1",
 		"",
 		"",
+		"",
+		"",
 	}
 	writer.Write(data)
 
@@ -421,6 +423,8 @@ func writeCalendarTxt() {
 		"",
 		"",
 		"1",
+		"",
+		"",
 	}
 	writer.Write(data)
 
@@ -432,6 +436,8 @@ func writeCalendarTxt() {
 		"",
 		"",
 		"1",
+		"",
+		"",
 		"",
 	}
 	writer.Write(data)
@@ -666,7 +672,10 @@ func toTime(str string) string {
 	time, _ = strconv.Atoi(str)
 	h := time / 60
 	m := time % 60
-	hhmm := strconv.Itoa(h) + ":" + strconv.Itoa(m)
+	hh := fmt.Sprintf("%02d", h)
+	mm := fmt.Sprintf("%02d", m)
+	hhmm := hh + ":" + mm
+	//hhmm := strconv.Itoa(hh) + ":" + strconv.Itoa(m)
 
 	return hhmm
 }
