@@ -40,6 +40,7 @@ type Trip struct {
 	route_id  string
 	yobi      string
 	stopTimes []StopTime
+	col3      string // 3:通常  2:列車備考(MarkMaster)
 }
 
 // バス停と着発時刻
@@ -225,6 +226,7 @@ func readDiaMasterTsv() {
 		} else if yobi == "3" {
 			trip.yobi = "3_特殊"
 		}
+		trip.col3 = elements[3]
 		trip.route_id = elements[4]
 
 		// 5列目 stop_id 6列名 着時刻 7列名 発時刻 を stopTimeに格納  8列名 9列目は捨てる
@@ -560,6 +562,11 @@ func writeStopTimesTxt() {
 	writer.Write(data)
 	// tripListの要素を取り出しながらループ
 	for _, trip := range tripList {
+
+		if trip.col3 == "2" {
+			continue
+		}
+
 		var sequence int = 1
 		for _, stopTime := range trip.stopTimes {
 			data := []string{
