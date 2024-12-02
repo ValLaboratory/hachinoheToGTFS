@@ -128,7 +128,7 @@ func readStopMasterTsv() {
 		// stop構造体を作成
 		var stop Stop = Stop{}
 		// stop構造体に分割された要素を格納
-		stop.id = elements[1]
+		stop.id = maeZero(elements[1], 4) + "000"
 		stop.name = elements[2]
 		stop.yomi = elements[3]
 		stopMap[stop.id] = stop
@@ -233,18 +233,12 @@ func readDiaMasterTsv() {
 		// 10列名以降はその繰り返し
 		// 5列名以降の繰り返しの数を計算
 		var elementSize int = len(elements)
-		var blockCnt int = (len(elements) - 4) / 5
+		var blockCnt int = (len(elements) - 5) / 5
 
-		j := 0
 		for i := 0; i < blockCnt; i++ {
 			// stopTime構造体に分割された要素を格納
 			var stopTime StopTime
 			stopTime.stop_id = elements[5+i*5]
-
-			// stop_idが0で終わる場合は、スキップ
-			if strings.HasSuffix(stopTime.stop_id, "000") {
-				continue
-			}
 
 			if 6+i*3 < elementSize {
 				stopTime.arrival_time = toTime(elements[6+i*5])
@@ -262,11 +256,10 @@ func readDiaMasterTsv() {
 			}
 			trip.stopTimes = append(trip.stopTimes, stopTime)
 
-			if j == 0 {
+			if i == 0 {
 				trip.id = trip.route_id + "_" + trip.yobi + "_" + stopTime.departure_time
 			}
 
-			j++
 		}
 
 		// trip配列にtripを追加
@@ -279,7 +272,7 @@ func writeStopsTxt() {
 	fmt.Println("stops.txt出力")
 
 	// stop_times.txtに出力する stop_id をマップに格納
-	var poleIdMap map[string]string = make(map[string]string)
+	var poleIdMap map[string]bool = make(map[string]bool)
 
 	// tripListの要素を取り出しながらループ
 	for _, trip := range tripList {
@@ -287,7 +280,7 @@ func writeStopsTxt() {
 			if _, ok := poleIdMap[stopTime.stop_id]; ok {
 				continue
 			} else {
-				poleIdMap[stopTime.stop_id] = stopTime.stop_id
+				poleIdMap[stopTime.stop_id] = false
 			}
 		}
 	}
@@ -314,8 +307,24 @@ func writeStopsTxt() {
 				"",
 			}
 			writer.Write(data)
+			poleIdMap[pole.id] = true
 		}
 	}
+	for stop_id, ok := range poleIdMap {
+		if !ok {
+			fmt.Println(stop_id)
+			if stop, ok := stopMap[stop_id]; ok {
+				data := []string{
+					stop.id,
+					stop.name,
+					"",
+					"",
+				}
+				writer.Write(data)
+			}
+		}
+	}
+
 	writer.Flush()
 }
 
