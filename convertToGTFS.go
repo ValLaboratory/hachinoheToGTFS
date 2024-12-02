@@ -242,7 +242,7 @@ func readDiaMasterTsv() {
 			stopTime.stop_id = elements[5+i*5]
 
 			// stop_idが0で終わる場合は、スキップ
-			if strings.HasSuffix(stopTime.stop_id, "0") {
+			if strings.HasSuffix(stopTime.stop_id, "000") {
 				continue
 			}
 
