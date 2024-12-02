@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"golang.org/x/text/encoding/japanese"
 	"golang.org/x/text/transform"
@@ -167,7 +168,7 @@ func readStopPoleMasterTsv() {
 		// pole構造体を作成
 		var pole Pole = Pole{}
 		// stop構造体に分割された要素を格納
-		pole.id = maeZero(elements[1])
+		pole.id = maeZero(elements[1], 7)
 		pole.stop_id = elements[2]
 		pole.name = elements[4]
 		poleList = append(poleList, pole)
@@ -383,6 +384,7 @@ func writeCalendarTxt() {
 	fmt.Println("calendar.txtを出力")
 	file, _ := os.Create("output/calendar.txt")
 	defer file.Close()
+
 	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
 	writer.UseCRLF = true //改行コードを\r\nにする
 	// 見出し行を出力
@@ -400,6 +402,12 @@ func writeCalendarTxt() {
 	}
 	writer.Write(data)
 
+	today := time.Now()
+	// 月初
+	gessho := time.Date(today.Year(), today.Month(), 1, 0, 0, 0, 0, time.UTC)
+	// 1年後の月末
+	after1Year := gessho.AddDate(1, 0, -1)
+
 	data = []string{
 		"1_平日",
 		"1",
@@ -409,8 +417,8 @@ func writeCalendarTxt() {
 		"1",
 		"",
 		"",
-		"",
-		"",
+		strconv.Itoa(gessho.Year()) + maeZero(strconv.Itoa((int)(gessho.Month())), 2) + "01",
+		strconv.Itoa(after1Year.Year()) + maeZero(strconv.Itoa((int)(after1Year.Month())), 2) + maeZero(strconv.Itoa(after1Year.Day()), 2),
 	}
 	writer.Write(data)
 
@@ -423,8 +431,8 @@ func writeCalendarTxt() {
 		"",
 		"",
 		"1",
-		"",
-		"",
+		strconv.Itoa(gessho.Year()) + maeZero(strconv.Itoa((int)(gessho.Month())), 2) + "01",
+		strconv.Itoa(after1Year.Year()) + maeZero(strconv.Itoa((int)(after1Year.Month())), 2) + maeZero(strconv.Itoa(after1Year.Day()), 2),
 	}
 	writer.Write(data)
 
@@ -437,8 +445,8 @@ func writeCalendarTxt() {
 		"",
 		"1",
 		"",
-		"",
-		"",
+		strconv.Itoa(gessho.Year()) + maeZero(strconv.Itoa((int)(gessho.Month())), 2) + "01",
+		strconv.Itoa(after1Year.Year()) + maeZero(strconv.Itoa((int)(after1Year.Month())), 2) + maeZero(strconv.Itoa(after1Year.Day()), 2),
 	}
 	writer.Write(data)
 
@@ -451,6 +459,8 @@ func writeCalendarTxt() {
 		"",
 		"",
 		"",
+		strconv.Itoa(gessho.Year()) + maeZero(strconv.Itoa((int)(gessho.Month())), 2) + "01",
+		strconv.Itoa(after1Year.Year()) + maeZero(strconv.Itoa((int)(after1Year.Month())), 2) + maeZero(strconv.Itoa(after1Year.Day()), 2),
 	}
 	writer.Write(data)
 
@@ -681,8 +691,10 @@ func toTime(str string) string {
 }
 
 // 前ゼロ埋め
-func maeZero(str string) string {
-	var len = 7 - len(str)
+// str 文字列
+// size 桁数
+func maeZero(str string, size int) string {
+	var len = size - len(str)
 	for i := 0; i < len; i++ {
 		str = "0" + str
 	}
