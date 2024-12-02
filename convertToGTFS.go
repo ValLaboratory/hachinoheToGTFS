@@ -595,6 +595,11 @@ func writeTripsTxt() {
 	// tripListの要素を取り出しながらループ
 	for _, trip := range tripList {
 		// tripをtrips.txtに出力
+
+		if trip.id == "" {
+			continue
+		}
+
 		data := []string{
 			trip.route_id,
 			trip.yobi,
