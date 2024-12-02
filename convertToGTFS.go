@@ -100,9 +100,6 @@ func main() {
 	// tripListの要素をstop_times.txtに出力
 	writeStopTimesTxt()
 
-	// infoListの要素をfeedinfo.txtに出力
-	//writeFeedinfoTxt()
-
 	// calendar.txtに出力
 	writeCalendarTxt()
 
@@ -670,15 +667,27 @@ func readGenerationMasterTsvAndWriteFeedInfoTxt() {
 	defer wfile.Close()
 	var writer *csv.Writer = csv.NewWriter(wfile)
 	writer.UseCRLF = true //改行コードを\r\nにする
+
 	// 見出し行を出力
 	wdata := []string{
 		"feed_start_date",
 		"feed_version",
+		"feed_start_date",
+		"feed_end_date",
 	}
 	writer.Write(wdata)
+
+	today := time.Now()
+	// 月初
+	gessho := time.Date(today.Year(), today.Month(), 1, 0, 0, 0, 0, time.UTC)
+	// 1年後の月末
+	after1Year := gessho.AddDate(1, 0, -1)
+
 	wdata = []string{
 		elements[1],
 		elements[2],
+		strconv.Itoa(gessho.Year()) + maeZero(strconv.Itoa((int)(gessho.Month())), 2) + "01",
+		strconv.Itoa(after1Year.Year()) + maeZero(strconv.Itoa((int)(after1Year.Month())), 2) + maeZero(strconv.Itoa(after1Year.Day()), 2),
 	}
 	writer.Write(wdata)
 	writer.Flush()

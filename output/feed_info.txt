@@ -1,2 +1,2 @@
-feed_start_date,feed_version
-20240401,R６ダイヤ＿正式
+feed_start_date,feed_version,feed_start_date,feed_end_date
+20240401,R６ダイヤ＿正式,20241201,20251130
