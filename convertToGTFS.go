@@ -14,11 +14,6 @@ import (
 	"golang.org/x/text/transform"
 )
 
-// 改定内容
-type Info struct {
-	version string
-}
-
 // バス停
 type Stop struct {
 	id   string
@@ -69,9 +64,6 @@ var routeMap map[string]Route = make(map[string]Route)
 
 // Trip配列
 var tripList []Trip
-
-// info配列
-var infoList []Info
 
 func main() {
 	fmt.Println("処理開始")
