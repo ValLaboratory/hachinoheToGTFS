@@ -233,6 +233,7 @@ func readDiaMasterTsv() {
 		var elementSize int = len(elements)
 		var blockCnt int = (len(elements) - 4) / 5
 
+		j := 0
 		for i := 0; i < blockCnt; i++ {
 			// stopTime構造体に分割された要素を格納
 			var stopTime StopTime
@@ -259,9 +260,11 @@ func readDiaMasterTsv() {
 			}
 			trip.stopTimes = append(trip.stopTimes, stopTime)
 
-			if i == 0 {
+			if j == 0 {
 				trip.id = trip.route_id + "_" + trip.yobi + "_" + stopTime.departure_time
 			}
+
+			j++
 		}
 
 		// trip配列にtripを追加
