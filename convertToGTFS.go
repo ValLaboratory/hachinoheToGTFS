@@ -294,7 +294,7 @@ func writeStopsTxt() {
 
 	file, _ := os.Create("output/stops.txt")
 	defer file.Close()
-	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
+	var writer *csv.Writer = csv.NewWriter(file)
 	writer.UseCRLF = true //改行コードを\r\nにする
 	// 見出し行を出力
 	data := []string{
@@ -385,7 +385,7 @@ func writeCalendarTxt() {
 	file, _ := os.Create("output/calendar.txt")
 	defer file.Close()
 
-	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
+	var writer *csv.Writer = csv.NewWriter(file)
 	writer.UseCRLF = true //改行コードを\r\nにする
 	// 見出し行を出力
 	data := []string{
@@ -472,7 +472,7 @@ func writeAgencyTxt() {
 	fmt.Println("agency.txtを出力")
 	file, _ := os.Create("output/agency.txt")
 	defer file.Close()
-	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
+	var writer *csv.Writer = csv.NewWriter(file)
 	writer.UseCRLF = true //改行コードを\r\nにする
 	// 見出し行を出力
 	data := []string{
@@ -499,7 +499,7 @@ func writeTranslationsTxt() {
 	fmt.Println("translations.txt出力")
 	file, _ := os.Create("output/translations.txt")
 	defer file.Close()
-	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
+	var writer *csv.Writer = csv.NewWriter(file)
 	writer.UseCRLF = true //改行コードを\r\nにする
 	// 見出し行を出力
 	data := []string{
@@ -550,7 +550,7 @@ func writeRoutesTxt() {
 	fmt.Println("routes.txt出力")
 	file, _ := os.Create("output/routes.txt")
 	defer file.Close()
-	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
+	var writer *csv.Writer = csv.NewWriter(file)
 	writer.UseCRLF = true //改行コードを\r\nにする
 	// 見出し行を出力
 	data := []string{
@@ -575,7 +575,7 @@ func writeTripsTxt() {
 	fmt.Println("trips.txt出力")
 	file, _ := os.Create("output/trips.txt")
 	defer file.Close()
-	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
+	var writer *csv.Writer = csv.NewWriter(file)
 	writer.UseCRLF = true //改行コードを\r\nにする
 	// 見出し行を出力
 	data := []string{
@@ -602,7 +602,7 @@ func writeStopTimesTxt() {
 	fmt.Println("stop_times.txt出力")
 	file, _ := os.Create("output/stop_times.txt")
 	defer file.Close()
-	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
+	var writer *csv.Writer = csv.NewWriter(file)
 	writer.UseCRLF = true //改行コードを\r\nにする
 	// 見出し行を出力
 	data := []string{
@@ -655,7 +655,7 @@ func readGenerationMasterTsvAndWriteFeedInfoTxt() {
 	fmt.Println("feed_info.txt出力")
 	wfile, _ := os.Create("output/feed_info.txt")
 	defer wfile.Close()
-	var writer *csv.Writer = csv.NewWriter(transform.NewWriter(wfile, japanese.ShiftJIS.NewEncoder()))
+	var writer *csv.Writer = csv.NewWriter(wfile)
 	writer.UseCRLF = true //改行コードを\r\nにする
 	// 見出し行を出力
 	wdata := []string{
