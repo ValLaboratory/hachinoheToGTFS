@@ -248,6 +248,12 @@ func readDiaMasterTsv() {
 			// stopTime構造体に分割された要素を格納
 			var stopTime StopTime
 			stopTime.stop_id = elements[5+i*5]
+
+			// stop_idが0で終わる場合は、スキップ
+			if strings.HasSuffix(stopTime.stop_id, "0") {
+				continue
+			}
+
 			if 6+i*3 < elementSize {
 				stopTime.arrival_time = toTime(elements[6+i*5])
 			}
@@ -555,6 +561,7 @@ func writeRoutesTxt() {
 	// 見出し行を出力
 	data := []string{
 		"route_id",
+		"agency_id",
 		"route_long_name",
 	}
 	writer.Write(data)
@@ -563,6 +570,7 @@ func writeRoutesTxt() {
 		// routeをsroutes.txtに出力
 		data := []string{
 			route.id,
+			"八戸市交通部",
 			route.name,
 		}
 		writer.Write(data)
