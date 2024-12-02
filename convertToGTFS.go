@@ -251,11 +251,11 @@ func readDiaMasterTsv() {
 				stopTime.departure_time = toTime(elements[7+i*5])
 			}
 			//発駅が空の時着駅時刻を埋める
-			if stopTime.arrival_time == "00:00" {
+			if stopTime.arrival_time == "00:00:00" {
 				stopTime.arrival_time = stopTime.departure_time
 			}
 			//着駅が空の時発駅時刻を埋める
-			if stopTime.departure_time == "00:00" {
+			if stopTime.departure_time == "00:00:00" {
 				stopTime.departure_time = stopTime.arrival_time
 			}
 			trip.stopTimes = append(trip.stopTimes, stopTime)
@@ -641,7 +641,7 @@ func toTime(str string) string {
 	m := time % 60
 	hh := fmt.Sprintf("%02d", h)
 	mm := fmt.Sprintf("%02d", m)
-	hhmm := hh + ":" + mm
+	hhmm := hh + ":" + mm + ":" + "00"
 	//hhmm := strconv.Itoa(hh) + ":" + strconv.Itoa(m)
 
 	return hhmm
