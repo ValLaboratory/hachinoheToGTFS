@@ -312,7 +312,6 @@ func writeStopsTxt() {
 	}
 	for stop_id, ok := range poleIdMap {
 		if !ok {
-			fmt.Println(stop_id)
 			if stop, ok := stopMap[stop_id]; ok {
 				data := []string{
 					stop.id,
