@@ -646,11 +646,10 @@ func readGenerationMasterTsvAndWriteFeedInfoTxt() {
 }
 
 // 時刻文字列を返す
-// 610→10:10
-// 301→05:01
+// 610→10:10:00
+// 301→05:01:00
 // hが10より小さかったら0を先頭に足す
 // mが10より小さかったら0を先頭に足す
-
 func toTime(str string) string {
 	var time int
 	time, _ = strconv.Atoi(str)
