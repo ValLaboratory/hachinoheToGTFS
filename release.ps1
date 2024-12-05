@@ -1,4 +1,5 @@
-go build
+go generate
+go build -ldflags "-s -w"
 # メッセージボックスを利用するためのアセンブリの読み込み(必須)
 Add-Type -Assembly System.Windows.Forms
 # コピー対象ファイル

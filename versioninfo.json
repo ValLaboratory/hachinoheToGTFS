@@ -1,35 +1,17 @@
 {
-    "FixedFileInfo": {
-        "FileVersion": {
-            "Major": 1,
-            "Minor": 0,
-            "Patch": 0,
-            "Build": 0
-        },
-        "ProductVersion": {
-            "Major": 1,
-            "Minor": 0,
-            "Patch": 0,
-            "Build": 0
-        },
-        "FileFlagsMask": "3f",
-        "FileFlags ": "00",
-        "FileOS": "040004",
-        "FileType": "01",
-        "FileSubType": "00"
-    },
+
     "StringFileInfo": {
         "Comments": "",
         "CompanyName": "会社名",
         "FileDescription": "ファイルの説明",
-        "FileVersion": "1.0.0.0",
-        "InternalName": "test",
+        "FileVersion": "0.4.1.0",
+        "InternalName": "八戸市GTFSConverter",
         "LegalCopyright": "Copyright (C) 2018 会社名",
         "LegalTrademarks": "",
-        "OriginalFilename": "test.exe",
+        "OriginalFilename": "hachinoheToGTFS.exe",
         "PrivateBuild": "",
         "ProductName": "製品名",
-        "ProductVersion": "1.0.0.0",
+        "ProductVersion": "0.1.0.0",
         "SpecialBuild": ""
     },
     "VarFileInfo": {
