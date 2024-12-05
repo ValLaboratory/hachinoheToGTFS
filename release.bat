@@ -1,1 +1,0 @@
-copy hachinoheToGTFS.exe  "\\contents-storage\horus\tools\路線バス_ダイヤ取込\八戸市営_GTFSコンバーター\検証版\hachinoheToGTFS.exe"

@@ -14,12 +14,14 @@ if( Test-Path $path ){
   if ( !( $v1 -eq $v2 ) ) {
     $result = [System.Windows.Forms.MessageBox]::Show("検証版にリリースしますか？",$v1,"YesNo","Question","Button2")
     if ($result -eq "Yes") {
-      powershell -Command "./release.bat"
+      $command = "copy " + $target + " " + $path
+      powershell -Command $command
     }
   }
 } else {
   $result = [System.Windows.Forms.MessageBox]::Show("検証版にリリースしますか？",$v1,"YesNo","Question","Button2")
   if ($result -eq "Yes") {
-    powershell -Command "./release.bat"
+    $command = "copy " + $target + " " + $path
+    powershell -Command $command
   }
 }
