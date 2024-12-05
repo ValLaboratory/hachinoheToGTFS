@@ -1,4 +1,4 @@
-module github.com/ValLaboratory/keio-railway
+module github.com/ValLaboratory/hachinoheToGTFS
 
 go 1.19
 
