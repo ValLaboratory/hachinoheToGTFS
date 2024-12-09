@@ -22,3 +22,8 @@ func TestMaeZero(t *testing.T) {
 	expected := "0000003"
 	assert.Equal(t, expected, actual)
 }
+func TestInsertUnder(t *testing.T) {
+	actual := insertUnder("0621001")
+	expected := "0621_001"
+	assert.Equal(t, expected, actual)
+}

@@ -251,7 +251,7 @@ func writeStopsTxt() {
 		// poleをstops.txtに出力
 		if _, ok := poleIdMap[pole.id]; ok {
 			data := []string{
-				pole.id,
+				insertUnder(pole.id),
 				pole.name,
 				"",
 				"",
@@ -264,7 +264,7 @@ func writeStopsTxt() {
 		if !ok {
 			if stop, ok := stopMap[stop_id]; ok {
 				data := []string{
-					stop.id,
+					insertUnder(stop.id),
 					stop.name,
 					"",
 					"",
@@ -531,7 +531,7 @@ func writeStopTimesTxt() {
 				trip.id,
 				stopTime.arrival_time,
 				stopTime.departure_time,
-				stopTime.stop_id,
+				insertUnder(stopTime.stop_id),
 				strconv.Itoa(sequence),
 			}
 			writer.Write(data)
@@ -627,4 +627,13 @@ func sjis_to_utf8(str string) string {
 	var iostr = transform.NewReader(strings.NewReader(str), japanese.ShiftJIS.NewDecoder())
 	var iobyte, _ = io.ReadAll(iostr)
 	return string(iobyte)
+}
+
+// _でコード分割
+// str 文字列
+func insertUnder(str string) string {
+	x := str[0:4] // -> "EFGhij"
+	y := str[4:7]
+	return x + "_" + y
+
 }
