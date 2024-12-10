@@ -251,7 +251,7 @@ func writeStopsTxt() {
 		// poleをstops.txtに出力
 		if _, ok := poleIdMap[pole.id]; ok {
 			data := []string{
-				insertUnder(pole.id),
+				insertUnderScore(pole.id),
 				pole.name,
 				"",
 				"",
@@ -264,7 +264,7 @@ func writeStopsTxt() {
 		if !ok {
 			if stop, ok := stopMap[stop_id]; ok {
 				data := []string{
-					insertUnder(stop.id),
+					insertUnderScore(stop.id),
 					stop.name,
 					"",
 					"",
@@ -534,7 +534,7 @@ func writeStopTimesTxt() {
 				trip.id,
 				stopTime.arrival_time,
 				stopTime.departure_time,
-				insertUnder(stopTime.stop_id),
+				insertUnderScore(stopTime.stop_id),
 				strconv.Itoa(sequence),
 			}
 			writer.Write(data)
@@ -634,8 +634,9 @@ func sjis_to_utf8(str string) string {
 
 // _でコード分割
 // str 文字列
-func insertUnder(str string) string {
-	x := str[0:4] // -> "EFGhij"
-	y := str[4:7]
+// ABCDEFG → ABCD_EFG
+func insertUnderScore(str string) string {
+	x := str[0:4] // 先頭4文字
+	y := str[4:7] // 末尾3文字
 	return x + "_" + y
 }
