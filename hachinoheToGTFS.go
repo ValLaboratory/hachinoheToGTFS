@@ -491,6 +491,9 @@ func writeTripsTxt() {
 		if trip.id == "" {
 			continue
 		}
+		if trip.col3 == "2" {
+			continue
+		}
 
 		data := []string{
 			trip.route_id,
@@ -635,5 +638,4 @@ func insertUnder(str string) string {
 	x := str[0:4] // -> "EFGhij"
 	y := str[4:7]
 	return x + "_" + y
-
 }
