@@ -78,7 +78,7 @@ func readStopMasterTsv() {
 		// stop構造体を作成
 		var stop Stop = Stop{}
 		// stop構造体に分割された要素を格納
-		stop.id = maeZero(elements[1], 4) + "000"
+		stop.id = elements[1]
 		stop.name = elements[2]
 		stop.yomi = elements[3]
 		stopMap[stop.id] = stop
@@ -421,7 +421,7 @@ func writeTranslationsTxt() {
 		}
 
 		if stop, ok := stopMap[pole.stop_id]; ok {
-			// stopをstops.txtに出力
+			// stopをtranslations.txtに出力
 			data := []string{
 				"stops",
 				"stop_name",
