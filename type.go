@@ -19,7 +19,7 @@ type Route struct {
 	id       string
 	name     string
 	stop_ids []string
-	ikisakis []string
+	ikisaki  string
 }
 
 // 便

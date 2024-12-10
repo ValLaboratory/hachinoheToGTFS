@@ -82,7 +82,7 @@ func readStopMasterTsv() {
 		// stop構造体を作成
 		var stop Stop = Stop{}
 		// stop構造体に分割された要素を格納
-		stop.id = maeZero(elements[1], 4) + "000"
+		stop.id = maeZero(elements[1], 4)
 		stop.name = elements[2]
 		stop.yomi = elements[3]
 		stopMap[stop.id] = stop
@@ -113,7 +113,7 @@ func readStopPoleMasterTsv() {
 		var pole Pole = Pole{}
 		// stop構造体に分割された要素を格納
 		pole.id = maeZero(elements[1], 7)
-		pole.stop_id = maeZero(elements[2], 4) + "000"
+		pole.stop_id = maeZero(elements[2], 4)
 		pole.name = elements[4]
 		poleList = append(poleList, pole)
 	}
@@ -173,13 +173,13 @@ func readRoutePassInfoMasterTsv() {
 		var blockCnt int = (len(elements) - 4) / 6
 
 		if route, ok := routeMap[route_id]; ok {
+			route.ikisaki = elements[2]
 			route.stop_ids = make([]string, blockCnt)
 			for i := 0; i < blockCnt; i++ {
 				if 8+i*6 < elementSize {
 					route.stop_ids[i] = elements[8+i*6]
 				}
 			}
-			//routeMap[route_id] = route
 		}
 	}
 }
@@ -260,23 +260,6 @@ func readDiaMasterTsv() {
 // poleListの要素をstops.txtに出力
 func writeStopsTxt() {
 	fmt.Println("stops.txt出力")
-
-	// stop_times.txtに出力する stop_id をマップに格納
-	//var poleIdMap map[string]bool = make(map[string]bool)
-
-	// tripListの要素を取り出しながらループ
-	/*
-		for _, trip := range tripList {
-			for _, stopTime := range trip.stopTimes {
-				if _, ok := poleIdMap[stopTime.stop_id]; ok {
-					continue
-				} else {
-					poleIdMap[stopTime.stop_id] = false
-				}
-			}
-		}
-	*/
-
 	file, _ := os.Create("output/stops.txt")
 	defer file.Close()
 	var writer *csv.Writer = csv.NewWriter(file)
@@ -290,8 +273,6 @@ func writeStopsTxt() {
 	}
 	writer.Write(data)
 	for _, pole := range poleList {
-		// poleをstops.txtに出力
-		//if _, ok := poleIdMap[pole.id]; ok {
 		data := []string{
 			insertUnderScore(pole.id),
 			pole.name,
@@ -299,26 +280,8 @@ func writeStopsTxt() {
 			"",
 		}
 		writer.Write(data)
-		//poleIdMap[pole.id] = true
-		//}
 	}
 
-	// 上記で出力できてないstop_idを出力
-	/*
-		for stop_id, ok := range poleIdMap {
-			if !ok {
-				if stop, ok := stopMap[stop_id]; ok {
-					data := []string{
-						insertUnderScore(stop.id),
-						stop.name,
-						"",
-						"",
-					}
-					writer.Write(data)
-				}
-			}
-		}
-	*/
 	writer.Flush()
 }
 
@@ -527,12 +490,12 @@ func writeTripsTxt() {
 		"route_id",
 		"service_id",
 		"trip_id",
+		"trip_headsign",
 	}
 	writer.Write(data)
 	// tripListの要素を取り出しながらループ
 	for _, trip := range tripList {
 		// tripをtrips.txtに出力
-
 		if trip.id == "" {
 			continue
 		}
@@ -540,10 +503,23 @@ func writeTripsTxt() {
 			continue
 		}
 
+		var headsign string = ""
+		route, ok := routeMap[trip.route_id]
+		if ok {
+			if route.ikisaki != "" {
+				ikisaki := route.ikisaki[0:4]
+				stop, ok := stopMap[maeZero(ikisaki, 4)]
+				if ok {
+					headsign = stop.name
+				}
+			}
+		}
+
 		data := []string{
 			trip.route_id,
 			trip.yobi,
 			trip.id,
+			headsign,
 		}
 		writer.Write(data)
 	}
