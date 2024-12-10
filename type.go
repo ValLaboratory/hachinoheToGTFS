@@ -16,8 +16,10 @@ type Pole struct {
 
 // 系統
 type Route struct {
-	id   string
-	name string
+	id       string
+	name     string
+	stop_ids []string
+	ikisakis []string
 }
 
 // 便
@@ -47,7 +49,7 @@ var poleList []Pole
 // Route連想配列
 // キー route_id
 // 値 Route
-var routeMap map[string]Route = make(map[string]Route)
+var routeMap map[string]*Route = make(map[string]*Route)
 
 // Trip配列
 var tripList []Trip
