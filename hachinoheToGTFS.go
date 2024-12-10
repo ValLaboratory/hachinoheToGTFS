@@ -26,11 +26,15 @@ func main() {
 
 	// inpput/RouteMaster.tsvを読み込んで、routeをrouteMapに格納
 	readRouteMasterTsv()
-	// routeMap連想配列の要素をroutes.txtに出力
-	writeRoutesTxt()
+
+	// inpput/RoutePassInfoMaster.tsvを読み込んで、routeに格納
+	readRoutePassInfoMasterTsv()
 
 	// inpput/DiaMaster.tsvを読み込んで、tripListに格納
 	readDiaMasterTsv()
+
+	// routeMap連想配列の要素をroutes.txtに出力
+	writeRoutesTxt()
 
 	// pole配列の要素をstops.txtに出力
 	writeStopsTxt()
@@ -140,7 +144,43 @@ func readRouteMasterTsv() {
 		// stop構造体に分割された要素を格納
 		route.id = elements[1]
 		route.name = elements[5]
-		routeMap[route.id] = route
+		routeMap[route.id] = &route
+	}
+}
+
+// inpput/RoutePassInfoMaster.tsvを読み込んで、routeに格納
+func readRoutePassInfoMasterTsv() {
+	fmt.Println("RoutePassInfoMaster.tsv読み込み")
+	var file string = "input/RoutePassInfoMaster.tsv"
+	if _, err := os.Stat(file); err != nil {
+		fmt.Println("ファイルは存在しません！" + file)
+		os.Exit(1)
+	}
+	data, _ := os.Open(file)
+	defer data.Close()
+
+	var line string
+
+	scanner := bufio.NewScanner(data)
+	// 1行ずつ読み込み
+	for scanner.Scan() {
+		// 1行読み込み
+		line = sjis_to_utf8(scanner.Text())
+		// 1行をタブで分割
+		elements := strings.Split(line, "\t")
+		route_id := elements[1]
+		var elementSize int = len(elements)
+		var blockCnt int = (len(elements) - 4) / 6
+
+		if route, ok := routeMap[route_id]; ok {
+			route.stop_ids = make([]string, blockCnt)
+			for i := 0; i < blockCnt; i++ {
+				if 8+i*6 < elementSize {
+					route.stop_ids[i] = elements[8+i*6]
+				}
+			}
+			//routeMap[route_id] = route
+		}
 	}
 }
 
@@ -185,7 +225,7 @@ func readDiaMasterTsv() {
 		var elementSize int = len(elements)
 		var blockCnt int = (len(elements) - 5) / 5
 
-		for i := 0; i < blockCnt; i++ {
+		for i := 1; i < blockCnt; i++ {
 			// stopTime構造体に分割された要素を格納
 			var stopTime StopTime
 			stopTime.stop_id = elements[5+i*5]
@@ -206,7 +246,7 @@ func readDiaMasterTsv() {
 			}
 			trip.stopTimes = append(trip.stopTimes, stopTime)
 
-			if i == 0 {
+			if i == 1 {
 				trip.id = trip.route_id + "_" + trip.yobi + "_" + stopTime.departure_time
 			}
 
@@ -222,18 +262,20 @@ func writeStopsTxt() {
 	fmt.Println("stops.txt出力")
 
 	// stop_times.txtに出力する stop_id をマップに格納
-	var poleIdMap map[string]bool = make(map[string]bool)
+	//var poleIdMap map[string]bool = make(map[string]bool)
 
 	// tripListの要素を取り出しながらループ
-	for _, trip := range tripList {
-		for _, stopTime := range trip.stopTimes {
-			if _, ok := poleIdMap[stopTime.stop_id]; ok {
-				continue
-			} else {
-				poleIdMap[stopTime.stop_id] = false
+	/*
+		for _, trip := range tripList {
+			for _, stopTime := range trip.stopTimes {
+				if _, ok := poleIdMap[stopTime.stop_id]; ok {
+					continue
+				} else {
+					poleIdMap[stopTime.stop_id] = false
+				}
 			}
 		}
-	}
+	*/
 
 	file, _ := os.Create("output/stops.txt")
 	defer file.Close()
@@ -249,33 +291,34 @@ func writeStopsTxt() {
 	writer.Write(data)
 	for _, pole := range poleList {
 		// poleをstops.txtに出力
-		if _, ok := poleIdMap[pole.id]; ok {
-			data := []string{
-				insertUnderScore(pole.id),
-				pole.name,
-				"",
-				"",
-			}
-			writer.Write(data)
-			poleIdMap[pole.id] = true
+		//if _, ok := poleIdMap[pole.id]; ok {
+		data := []string{
+			insertUnderScore(pole.id),
+			pole.name,
+			"",
+			"",
 		}
-	}
-	// 上記で出力できてないstop_idを出力
-	for stop_id, ok := range poleIdMap {
-		if !ok {
-			fmt.Println(stop_id)
-			if stop, ok := stopMap[stop_id]; ok {
-				data := []string{
-					insertUnderScore(stop.id),
-					stop.name,
-					"",
-					"",
-				}
-				writer.Write(data)
-			}
-		}
+		writer.Write(data)
+		//poleIdMap[pole.id] = true
+		//}
 	}
 
+	// 上記で出力できてないstop_idを出力
+	/*
+		for stop_id, ok := range poleIdMap {
+			if !ok {
+				if stop, ok := stopMap[stop_id]; ok {
+					data := []string{
+						insertUnderScore(stop.id),
+						stop.name,
+						"",
+						"",
+					}
+					writer.Write(data)
+				}
+			}
+		}
+	*/
 	writer.Flush()
 }
 
@@ -523,6 +566,9 @@ func writeStopTimesTxt() {
 		"stop_sequence",
 	}
 	writer.Write(data)
+
+	isBad := false
+
 	// tripListの要素を取り出しながらループ
 	for _, trip := range tripList {
 
@@ -530,17 +576,29 @@ func writeStopTimesTxt() {
 			continue
 		}
 
+		route := routeMap[trip.route_id]
+
 		var sequence int = 1
 		for _, stopTime := range trip.stopTimes {
-			data := []string{
-				trip.id,
-				stopTime.arrival_time,
-				stopTime.departure_time,
-				insertUnderScore(stopTime.stop_id),
-				strconv.Itoa(sequence),
+
+			if len(route.stop_ids) > sequence-1 {
+				data := []string{
+					trip.id,
+					stopTime.arrival_time,
+					stopTime.departure_time,
+					insertUnderScore(route.stop_ids[sequence-1]),
+					strconv.Itoa(sequence),
+				}
+				writer.Write(data)
+				sequence++
+			} else {
+				fmt.Printf("%s len=%d sequence=%d\n", trip.id, len(route.stop_ids), sequence)
+				isBad = true
+				break
 			}
-			writer.Write(data)
-			sequence++
+		}
+		if isBad {
+			break
 		}
 	}
 	writer.Flush()
