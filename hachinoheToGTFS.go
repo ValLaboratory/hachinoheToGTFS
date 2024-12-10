@@ -78,7 +78,7 @@ func readStopMasterTsv() {
 		// stop構造体を作成
 		var stop Stop = Stop{}
 		// stop構造体に分割された要素を格納
-		stop.id = elements[1]
+		stop.id = maeZero(elements[1], 4) + "000"
 		stop.name = elements[2]
 		stop.yomi = elements[3]
 		stopMap[stop.id] = stop
@@ -109,7 +109,7 @@ func readStopPoleMasterTsv() {
 		var pole Pole = Pole{}
 		// stop構造体に分割された要素を格納
 		pole.id = maeZero(elements[1], 7)
-		pole.stop_id = elements[2]
+		pole.stop_id = maeZero(elements[2], 4) + "000"
 		pole.name = elements[4]
 		poleList = append(poleList, pole)
 	}
@@ -260,8 +260,10 @@ func writeStopsTxt() {
 			poleIdMap[pole.id] = true
 		}
 	}
+	// 上記で出力できてないstop_idを出力
 	for stop_id, ok := range poleIdMap {
 		if !ok {
+			fmt.Println(stop_id)
 			if stop, ok := stopMap[stop_id]; ok {
 				data := []string{
 					insertUnderScore(stop.id),
