@@ -219,9 +219,9 @@ func readDiaMasterTsv() {
 		trip.col3 = elements[3]
 		trip.route_id = elements[4]
 
-		// 5列目 stop_id 6列名 着時刻 7列名 発時刻 を stopTimeに格納  8列名 9列目は捨てる
-		// 10列名以降はその繰り返し
-		// 5列名以降の繰り返しの数を計算
+		// 5列目 route_id 6～10列名は捨てる 11列目 stop_id 12列目 着時刻 13列名 発時刻 を stopTimeに格納  14列名 15列目は捨てる
+		// 16列名以降はその繰り返し
+		// 6列名以降の繰り返しの数を計算
 		var elementSize int = len(elements)
 		var blockCnt int = (len(elements) - 5) / 5
 
@@ -229,6 +229,11 @@ func readDiaMasterTsv() {
 			// stopTime構造体に分割された要素を格納
 			var stopTime StopTime
 			stopTime.stop_id = elements[5+i*5]
+
+			// stop_idが0で終わっている行はスキップ
+			if stopTime.stop_id[len(stopTime.stop_id)-1] == '0' {
+				continue
+			}
 
 			if 6+i*3 < elementSize {
 				stopTime.arrival_time = toTime(elements[6+i*5])
