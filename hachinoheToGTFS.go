@@ -170,15 +170,15 @@ func readRoutePassInfoMasterTsv() {
 		elements := strings.Split(line, "\t")
 		route_id := elements[1]
 		var elementSize int = len(elements)
-		var blockCnt int = (len(elements) - 4) / 6
+		var blockCnt int = (len(elements) - 2) / 6
 
 		if route, ok := routeMap[route_id]; ok {
 			// 行先 全角変換
 			route.ikisaki = elements[6] + " " + elements[5]
 			route.stop_ids = make([]string, blockCnt)
 			for i := 0; i < blockCnt; i++ {
-				if 8+i*6 < elementSize {
-					route.stop_ids[i] = elements[8+i*6]
+				if 2+i*6 < elementSize {
+					route.stop_ids[i] = elements[2+i*6]
 				}
 			}
 		}
@@ -220,21 +220,21 @@ func readDiaMasterTsv() {
 		trip.col3 = elements[3]
 		trip.route_id = elements[4]
 
+		// 6列目が0で終わっている行はスキップ
+		if elements[5][len(elements[5])-1] == '0' {
+			continue
+		}
+
 		// 5列目 route_id 6～10列名は捨てる 11列目 stop_id 12列目 着時刻 13列名 発時刻 を stopTimeに格納  14列名 15列目は捨てる
 		// 16列名以降はその繰り返し
 		// 6列名以降の繰り返しの数を計算
 		var elementSize int = len(elements)
-		var blockCnt int = (len(elements) - 5) / 5
+		var blockCnt int = (elementSize - 5) / 5
 
-		for i := 1; i < blockCnt; i++ {
+		for i := 0; i < blockCnt; i++ {
 			// stopTime構造体に分割された要素を格納
 			var stopTime StopTime
 			stopTime.stop_id = elements[5+i*5]
-
-			// stop_idが0で終わっている行はスキップ
-			if stopTime.stop_id[len(stopTime.stop_id)-1] == '0' {
-				continue
-			}
 
 			if 6+i*3 < elementSize {
 				stopTime.arrival_time = toTime(elements[6+i*5])
@@ -252,7 +252,7 @@ func readDiaMasterTsv() {
 			}
 			trip.stopTimes = append(trip.stopTimes, stopTime)
 
-			if i == 1 {
+			if i == 0 {
 				trip.id = trip.route_id + "_" + trip.yobi + "_" + stopTime.departure_time
 			}
 
@@ -557,6 +557,7 @@ func writeStopTimesTxt() {
 		route := routeMap[trip.route_id]
 
 		var sequence int = 1
+
 		for _, stopTime := range trip.stopTimes {
 
 			if len(route.stop_ids) > sequence-1 {
