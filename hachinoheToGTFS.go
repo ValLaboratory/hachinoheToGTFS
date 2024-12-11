@@ -173,7 +173,8 @@ func readRoutePassInfoMasterTsv() {
 		var blockCnt int = (len(elements) - 4) / 6
 
 		if route, ok := routeMap[route_id]; ok {
-			route.ikisaki = elements[2]
+			// 行先 全角変換
+			route.ikisaki = elements[6] + " " + elements[5]
 			route.stop_ids = make([]string, blockCnt)
 			for i := 0; i < blockCnt; i++ {
 				if 8+i*6 < elementSize {
@@ -512,11 +513,7 @@ func writeTripsTxt() {
 		route, ok := routeMap[trip.route_id]
 		if ok {
 			if route.ikisaki != "" {
-				ikisaki := route.ikisaki[0:4]
-				stop, ok := stopMap[maeZero(ikisaki, 4)]
-				if ok {
-					headsign = stop.name
-				}
+				headsign = route.ikisaki
 			}
 		}
 
