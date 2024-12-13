@@ -16,10 +16,11 @@ type Pole struct {
 
 // 系統
 type Route struct {
-	id       string
-	name     string
-	stop_ids []string
-	ikisaki  string
+	id        string
+	name      string
+	long_name string
+	stop_ids  []string
+	ikisaki   string
 }
 
 // 便
