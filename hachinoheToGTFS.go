@@ -220,8 +220,8 @@ func readDiaMasterTsv() {
 		trip.col3 = elements[3]
 		trip.route_id = elements[4]
 
-		// 6列目が0で終わっている行はスキップ
-		if elements[5][len(elements[5])-1] == '0' {
+		// 6列目が00で終わっている行はスキップ
+		if elements[5][len(elements[5])-2:] == "00" {
 			continue
 		}
 
