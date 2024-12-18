@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -173,13 +174,35 @@ func readRoutePassInfoMasterTsv() {
 		var blockCnt int = (len(elements) - 2) / 6
 
 		if route, ok := routeMap[route_id]; ok {
-			// 行先 全角変換
-			route.ikisaki = elements[6] + " " + elements[5]
+			// 行先
+			route.ikisaki = elements[5]
 			route.stop_ids = make([]string, blockCnt)
+
+			// 幕番
+			makuList := []string{}
 			for i := 0; i < blockCnt; i++ {
 				if 2+i*6 < elementSize {
 					route.stop_ids[i] = elements[2+i*6]
 				}
+				if 6+i*6 < elementSize {
+					maku := elements[6+i*6]
+					if maku != "" {
+						if !slices.Contains(makuList, maku) {
+							makuList = append(makuList, maku)
+						}
+					}
+				}
+			}
+
+			for i, maku := range makuList {
+				if i == 0 {
+					route.long_name = maku
+				} else {
+					route.long_name = route.long_name + "・" + maku
+				}
+			}
+			if route.long_name != "" && route.ikisaki != "" {
+				route.long_name += " " + route.ikisaki
 			}
 		}
 	}
@@ -468,16 +491,22 @@ func writeRoutesTxt() {
 	data := []string{
 		"route_id",
 		"agency_id",
-		"route_long_name",
+		"route_short_name",
 	}
 	writer.Write(data)
 	// routeMap連想配列の要素を取り出しながらループ
 	for _, route := range routeMap {
 		// routeをsroutes.txtに出力
+		var route_name string
+		if route.long_name == "" {
+			route_name = route.name
+		} else {
+			route_name = route.long_name
+		}
 		data := []string{
 			route.id,
 			"八戸市交通部",
-			route.name,
+			route_name,
 		}
 		writer.Write(data)
 	}
