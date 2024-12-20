@@ -4,14 +4,14 @@
         "Comments": "",
         "CompanyName": "会社名",
         "FileDescription": "ファイルの説明",
-        "FileVersion": "0.4.2.0",
+        "FileVersion": "0.1.2.0",
         "InternalName": "八戸市GTFSConverter",
         "LegalCopyright": "Copyright (C) 2018 会社名",
         "LegalTrademarks": "",
         "OriginalFilename": "hachinoheToGTFS.exe",
         "PrivateBuild": "",
         "ProductName": "製品名",
-        "ProductVersion": "0.1.0.0",
+        "ProductVersion": "0.2.0.0",
         "SpecialBuild": ""
     },
     "VarFileInfo": {
