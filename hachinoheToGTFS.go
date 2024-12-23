@@ -158,6 +158,7 @@ func readRoutePassInfoMasterTsv() {
 		os.Exit(1)
 	}
 	data, _ := os.Open(file)
+	// dataを使い終わったら閉じる
 	defer data.Close()
 
 	var line string
